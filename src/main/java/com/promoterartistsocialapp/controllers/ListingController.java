@@ -1,42 +1,41 @@
 package com.promoterartistsocialapp.controllers;
 
 import com.promoterartistsocialapp.domains.Listing;
+import com.promoterartistsocialapp.domains.ListingDTO;
 import com.promoterartistsocialapp.services.ListingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/listing")
+@RequestMapping("/api/listing")
 public class ListingController {
 
-    private final ListingService service;
-
-    public ListingController(ListingService service) {
-        this.service = service;
-    }
+    @Autowired
+    ListingService service;
 
     // create listing
     @PostMapping("/createListing")
-    public Listing createListing(@RequestBody Listing listing) {
+    public ListingDTO createListing(@RequestBody Listing listing) {
         return service.createListing(listing);
     }
 
     // get listing by id
     @GetMapping("/getListingById/{id}")
-    public Listing getListingById(@PathVariable("id") Long id) {
+    public ListingDTO getListingById(@PathVariable("id") Long id) {
         return service.getListingById(id);
     }
 
     // get all listing
     @GetMapping("/getAllListings")
-    public List<Listing> getAllListings() {
+    public List<ListingDTO> getAllListings() {
         return service.getAllListings();
     }
 
     // update listing
     @PutMapping("/updateListing/{id}")
-    public Listing updateListing(@RequestBody Listing listing, @PathVariable("id") Long id) {
+    public ListingDTO updateListing(@RequestBody Listing listing, @PathVariable("id") Long id) {
         return service.updateListing(id, listing);
     }
 

@@ -1,41 +1,53 @@
 package com.promoterartistsocialapp.services;
 
 import com.promoterartistsocialapp.domains.Listing;
+import com.promoterartistsocialapp.domains.ListingDTO;
+import com.promoterartistsocialapp.domains.Venue;
+import com.promoterartistsocialapp.domains.VenueDTO;
 import com.promoterartistsocialapp.exceptions.ListingNotFoundException;
+import com.promoterartistsocialapp.exceptions.VenueNotFoundException;
 import com.promoterartistsocialapp.repositories.ListingRepo;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ListingService {
 
-    private final ListingRepo repo;
+    @Autowired
+    ListingRepo repo;
 
-    public ListingService(ListingRepo repo) {
-        this.repo = repo;
+    @Autowired
+    ModelMapper mapper;
+
+    // mapToDTO
+    private ListingDTO mapToDTO(Listing listing) {
+        return this.mapper.map(listing, ListingDTO.class);
     }
 
     // create listing
-    public Listing createListing(Listing listing) {
-        return this.repo.save(listing);
+    public ListingDTO createListing(Listing listing) {
+        Listing newListing = this.repo.save(listing);
+        return this.mapToDTO(newListing);
     }
 
     // get listing by id
-    public Listing getListingById(Long id) throws ListingNotFoundException {
-        return this.repo.findById(id).orElseThrow(ListingNotFoundException::new);
+    public ListingDTO getListingById(Long id) throws ListingNotFoundException {
+        Listing foundListing = this.repo.findById(id).orElseThrow(VenueNotFoundException::new);
+        return this.mapToDTO(foundListing);
     }
 
     // get all listings
-    public List<Listing> getAllListings() {
-        List<Listing> allListings = new ArrayList<>();
-        allListings.addAll(repo.findAll());
-        return allListings;
+    public List<ListingDTO> getAllListings() {
+        return this.repo.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     // update listing by id
-    public Listing updateListing(Long id, Listing listing) {
+    public ListingDTO updateListing(Long id, Listing listing) {
         Listing listingToUpdate = repo.findById(id).orElse(new Listing());
 
         listingToUpdate.setListingDate(listing.getListingDate());
@@ -43,7 +55,8 @@ public class ListingService {
         listingToUpdate.setListingBaseOffer(listing.getListingBaseOffer());
         listingToUpdate.setListingEntryCost(listing.getListingEntryCost());
 
-        return repo.save(listingToUpdate);
+        Listing updatedListing = repo.save(listingToUpdate);
+        return this.mapToDTO(updatedListing);
     }
 
     // delete listing by id

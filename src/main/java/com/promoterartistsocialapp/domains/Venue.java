@@ -1,5 +1,6 @@
 package com.promoterartistsocialapp.domains;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @Setter
 @ToString
 @EqualsAndHashCode
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 public class Venue {
 
@@ -18,7 +20,7 @@ public class Venue {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long venueId;
 
-    @OneToMany(mappedBy = "venue", cascade = {CascadeType.REMOVE})
+    @OneToMany(mappedBy = "venue", orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Listing> venueListings;
 
     private String venueName;
